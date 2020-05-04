@@ -2,9 +2,9 @@
 
 # Schmidt-Samoa
 
-# Ayça Nur Budak    150401041
+# 
 # Birhan Berk Oktay 170401075
-# Ramazan Şahin     170401069
+# 
 
 # Wikipedia kullanıcı adı = Aycanurbudak
 
