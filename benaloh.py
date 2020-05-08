@@ -1,11 +1,9 @@
-from gmpy2 import invert
-
 import math
-from random import randrange
-import random
 import os
 import time
+from random import randrange
 
+from gmpy2 import invert
 
 r = 305
 # Block size, tek sayi olmak zorundadır.
@@ -53,7 +51,7 @@ def rabin_miller(p):
         return True
 
     for i in range(s):
-        a = random.randrange(2, p-2)
+        a = randrange(2, p-2)
         if witness(a):
             return False
 
