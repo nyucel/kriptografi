@@ -1,5 +1,5 @@
 # Pailler Kriptosistemi Python 3 ile uygulanışı
-
+**Hocam klasörü başta forklamadan çalışmalarımızı başka bir repoda yaptığımız için eski commitler gözükmeyecek, eğer eski commitleri incelemek isterseniz : https://github.com/emirkivrak/Paillier-cryptosystem**
 ## Table of Contents
 
 - [Çalışma hakkında](#about)
