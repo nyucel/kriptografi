@@ -1,3 +1,4 @@
+#Gökçe Kuler
 import random
 import math
 import os
