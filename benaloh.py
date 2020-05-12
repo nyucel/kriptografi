@@ -1,4 +1,5 @@
 #Ahmet Faruk Albayrak
+#Can Sözbir - 170401016
 import math
 import os
 import time
