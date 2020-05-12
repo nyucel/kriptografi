@@ -3,12 +3,27 @@ import os
 import time
 from random import randrange
 
-from gmpy2 import invert
-
-r = 305
-# Block size, tek sayi olmak zorundadır.
-# Aralarında asallık kontrolünden kurtulmak için asal seçilmesi faydalıdır.
+r = 1733
+# r => Block size, tek sayi olmak zorundadır.
+# Aralarında asallık kontrolünden kurtulmak için asal seçilmesi sarttir.
 # Şifreleyeceğiniz mesaj r den kucuk olmak zorundadır.
+
+# Moduler carpimsal tersi islemini yapmazsak program yuksek r degerlerinde cok yavas sonlaniyordu.
+def egcd(a, b):
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = egcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+
+def modinv(a, m):
+    g, x, y = egcd(a, m)
+    if g != 1:
+        raise Exception('moduler ters bulunamadi')
+    else:
+        return x % m
+
 
 
 def generate_random(n):
@@ -16,15 +31,16 @@ def generate_random(n):
     n bitlik tek(odd) bir rastgele sayi olusturan fonksiyon.
 
     Arguments:
-        n (int) : olusturulacak sayinin bit lengthi
+        n (int) : olusturulacak sayinin bit uzunlugu
 
     Returns:
-        int : bir sayi, rastgele uretilmis , tek(odd)
+        (int) : rastgele uretilmis tek tamsayi
     """
     return randrange(2**(n - 1), 2**n) | 1
 
 
 def rabin_miller(p):
+    """add explanation if we keep this TODO"""
     s = 5
     if p == 2:
         return True
@@ -51,7 +67,7 @@ def rabin_miller(p):
         return True
 
     for i in range(s):
-        a = randrange(2, p-2)
+        a = randrange(2, p - 2)
         if witness(a):
             return False
 
@@ -59,32 +75,29 @@ def rabin_miller(p):
 
 
 def keygen(n):
-    """
-    baneloh kriptosistemine uygun sekilde public ve private keyleri olusturup
-    bunlari publickey.txt ve privatekey.txt dosyalarina yazan fonksiyon.
-
+    """Benaloh kriptosistemi ile public, private anahtarlari olusturup sirasiyla publickey.txt, privatekey.txt dosyalarina yazar.
     Arguments:
-        n (int) : olusturulacak anahtar boyutu
+        n (int) : anahtar bit uzunlugu
     """
     p = q = y = x = None
 
     while True:
-        p = generate_random(n//2)
-        if (p-1) % r == 0 and rabin_miller(p) and math.gcd(r, int((p-1)/r)) == 1:
+        p = generate_random(n // 2)
+        if (p - 1) % r == 0 and rabin_miller(p) and math.gcd(r, int((p - 1) / r)) == 1:
             break
 
     while True:
-        q = generate_random(n//2)
-        if rabin_miller(q) and math.gcd(r, int(q-1)) == 1:
+        q = generate_random(n // 2)
+        if rabin_miller(q) and math.gcd(r, int(q - 1)) == 1:
             break
 
     n_ = p * q
-    phi = (p-1) * (q-1)
+    phi = (p - 1) * (q - 1)
 
     while True:
         y = randrange(1, n_)
         if math.gcd(y, n_) == 1:
-            x = pow(y, phi * invert(r, n_) % n_, n_)
+            x = pow(y, phi * modinv(r, n_) % n_, n_)
             if x != 1:
                 break
 
@@ -105,14 +118,12 @@ def keygen(n):
 
 def encrypt(plaintext, publickey_txt):
     """
-    plaintext pathindeki dosyanin icerigini publickey_txt dosyasindan okudugu
-    public keyleri kullanaarak encrypt leyip ciphertext.txt dosyasina yazan
-    fonksiyon.
-
+    plaintext.txt dosyasinin icerigini publickey.txt dosyasindan okudugu
+    public anahtarlari kullanarak sifreleyip ciphertext.txt dosyasina yazar.
     Arguments:
-        plaintext (str) : sifrelenecek mesajin bulundugu dosyanin pathi
-        publickey_txt (str) : sifrelemede kullanilacak public keylerin \
-            okunacagi dosyanin pathi
+        plaintext (str) : sifrelenecek mesajin bulundugu dosyanin yolu
+        publickey_txt (str) : sifrelemede kullanilacak public anahtarlarin \
+            okunacagi dosyanin yolu
     """
     if not os.path.exists(publickey_txt):
         print(
@@ -145,14 +156,12 @@ def encrypt(plaintext, publickey_txt):
 
 
 def decrypt(ciphertext, privatekey_txt):
-    """ciphertext 
-
+    """ciphertext dosyasinin icerigini privatekey.txt dosyasinin icindeki anahtari kullanarak cozer ve plaintext2.txt dosyasina yazar.
     Arguments:
-        ciphertext (str) : ciphertext in yazili oldugu dosyanin pathi
-        privatekey_txt (str) : privatekey lerin yazili oldugu dosyanin pathi
-
+        ciphertext (str) : sifrelenmis plaintext'in yazili oldugu dosyanin yolu
+        privatekey_txt (str) : privatekey anahtarlarinin bulundugu dosyanin yolu
     Returns:
-        bool :  True if plaintext1.txt is equal to plaintext2.txt, 
+        bool :  True if plaintext1.txt is equal to plaintext2.txt,
                 False otherwise
     """
     if not os.path.exists(privatekey_txt):
@@ -174,8 +183,8 @@ def decrypt(ciphertext, privatekey_txt):
     with open(ciphertext, 'r') as c_file:
         c = int(c_file.readline().split('\n')[0])
 
-    a = pow(c, phi * invert(r, n_) % n_, n_)
-    for i in range(r-1):
+    a = pow(c, phi * modinv(r, n_) % n_, n_)
+    for i in range(r - 1):
         if pow(x, i, n_) == a:
             break
 
@@ -189,15 +198,15 @@ def decrypt(ciphertext, privatekey_txt):
 
 def is_same(file1, file2):
     """
-    Tek satırdan oluştuğu kabul edilen dosyaların içeriklerini kıyaslayıp 
-    aynı olup olmadıklarını geri döndüren fonksiyon. 
+    Tek satırdan oluştuğu kabul edilen dosyaların içeriklerini kıyaslayıp
+    aynı olup olmadıklarını geri döndüren fonksiyon.
 
     Arguments:
-        file1 (str) : The first file's path
-        file2 (str) : The second fıleis path
+        file1 (str) : Kiyaslanacak kaynagin yolu
+        file2 (str) : Kiyaslanan ciktinin yolu
 
     Returns:
-        bool : The return value, True if file1 is identical to file2, False otherwise.
+        bool : file 1, file 2 ile ayniysa True, degilse False dondurur.
     """
 
     if not os.path.exists(file1):
@@ -221,10 +230,12 @@ def is_same(file1, file2):
     else:
         return False
 
-
+# Test:
+#"""
 t1 = time.time()
-keygen(32)
+keygen(42)
 encrypt("plaintext.txt", "publickey.txt")
 decrypt("ciphertext.txt", "privatekey.txt")
 t2 = time.time()
-print('calisma suresi:', t2-t1)
+print('calisma suresi:', t2 - t1)
+#"""
