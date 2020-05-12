@@ -1,31 +1,18 @@
 #Ahmet Faruk Albayrak
 #Can Sözbir - 170401016
+#REQUIRES PYTHON 3.8 OR ABOVE!
+#Tested on Pop!_OS 20.04 LTS x86_64 & Kali 2020.1b
 import math
 import os
 import time
 from random import randrange
+from functions import isprime
+print("REQUIRES PYTHON 3.8 OR ABOVE!")
 
-r = 1733
+r = 1321
 # r => Block size, tek sayi olmak zorundadır.
 # Aralarında asallık kontrolünden kurtulmak için asal seçilmesi sarttir.
 # Şifreleyeceğiniz mesaj r den kucuk olmak zorundadır.
-
-# Moduler carpimsal tersi islemini yapmazsak program yuksek r degerlerinde cok yavas sonlaniyordu.
-def egcd(a, b):
-    if a == 0:
-        return (b, 0, 1)
-    else:
-        g, y, x = egcd(b % a, a)
-        return (g, x - (b // a) * y, y)
-
-
-def modinv(a, m):
-    g, x, y = egcd(a, m)
-    if g != 1:
-        raise Exception('moduler ters bulunamadi')
-    else:
-        return x % m
-
 
 
 def generate_random(n):
@@ -41,43 +28,10 @@ def generate_random(n):
     return randrange(2**(n - 1), 2**n) | 1
 
 
-def rabin_miller(p):
-    """add explanation if we keep this TODO"""
-    s = 5
-    if p == 2:
-        return True
-    if not (p & 1):
-        return False
-
-    p1 = p - 1
-    u = 0
-    r = p1
-
-    while r % 2 == 0:
-        r >>= 1
-        u += 1
-
-    def witness(a):
-        z = pow(a, r, p)
-        if z == 1:
-            return False
-
-        for i in range(u):
-            z = pow(a, 2**i * r, p)
-            if z == p1:
-                return False
-        return True
-
-    for i in range(s):
-        a = randrange(2, p - 2)
-        if witness(a):
-            return False
-
-    return True
-
-
 def keygen(n):
-    """Benaloh kriptosistemi ile public, private anahtarlari olusturup sirasiyla publickey.txt, privatekey.txt dosyalarina yazar.
+    """
+    Benaloh kriptosistemi ile public, private anahtarlari olusturup
+    sirasiyla publickey.txt, privatekey.txt dosyalarina yazar.
     Arguments:
         n (int) : anahtar bit uzunlugu
     """
@@ -85,12 +39,12 @@ def keygen(n):
 
     while True:
         p = generate_random(n // 2)
-        if (p - 1) % r == 0 and rabin_miller(p) and math.gcd(r, int((p - 1) / r)) == 1:
+        if (p - 1) % r == 0 and isprime(p) == 1 and math.gcd(r, int((p - 1) / r)) == 1:
             break
 
     while True:
         q = generate_random(n // 2)
-        if rabin_miller(q) and math.gcd(r, int(q - 1)) == 1:
+        if isprime(q) == 1 and math.gcd(r, int(q - 1)) == 1:
             break
 
     n_ = p * q
@@ -99,7 +53,7 @@ def keygen(n):
     while True:
         y = randrange(1, n_)
         if math.gcd(y, n_) == 1:
-            x = pow(y, phi * modinv(r, n_) % n_, n_)
+            x = pow(y, phi * pow(r, -1, n_) % n_, n_)
             if x != 1:
                 break
 
@@ -142,8 +96,12 @@ def encrypt(plaintext, publickey_txt):
         n_, y = publickey_file.read().split('\n')
         n_, y = int(n_), int(y)
 
+    mes = []
     with open(plaintext, 'r') as plain_file:
-        message = int(plain_file.readline().split('\n')[0])
+        for message_line in plain_file:
+            if message_line != '':
+                for char in message_line:
+                    mes.append(int(ord(char)))
 
     u = None
     while True:
@@ -151,20 +109,22 @@ def encrypt(plaintext, publickey_txt):
         if math.gcd(y, n_) == 1:
             break
 
-    ciphertext = pow(y, message, n_) * pow(u, r, n_) % n_
-
     with open('ciphertext.txt', 'w+') as ciphertext_file:
-        ciphertext_file.write(str(ciphertext))
+        for m in mes:
+            ciphertext = pow(y, m, n_) * pow(u, r, n_) % n_
+            ciphertext_file.write(str(ciphertext) + " ")
 
 
 def decrypt(ciphertext, privatekey_txt):
-    """ciphertext dosyasinin icerigini privatekey.txt dosyasinin icindeki anahtari kullanarak cozer ve plaintext2.txt dosyasina yazar.
+    """
+    ciphertext dosyasinin icerigini privatekey.txt dosyasinin
+    icindeki anahtari kullanarak cozer ve plaintext2.txt dosyasina yazar.
     Arguments:
         ciphertext (str) : sifrelenmis plaintext'in yazili oldugu dosyanin yolu
-        privatekey_txt (str) : privatekey anahtarlarinin bulundugu dosyanin yolu
+        privatekey_txt (str) :privatekey anahtarlarinin bulundugu dosyanin yolu
     Returns:
-        bool :  True if plaintext1.txt is equal to plaintext2.txt,
-                False otherwise
+        bool :  plaintext.txt, plaintext2.txt ile özdeş ise True
+                aksi halde False döndürür.
     """
     if not os.path.exists(privatekey_txt):
         print(
@@ -183,25 +143,27 @@ def decrypt(ciphertext, privatekey_txt):
         n_, phi, x = int(n_), int(phi), int(x)
 
     with open(ciphertext, 'r') as c_file:
-        c = int(c_file.readline().split('\n')[0])
-
-    a = pow(c, phi * modinv(r, n_) % n_, n_)
-    for i in range(r - 1):
-        if pow(x, i, n_) == a:
-            break
+        ciphertext_file = c_file.readline().split(
+            '\n')[0].split(" ")[:-1]
 
     with open("plaintext2.txt", 'w+') as plaintext2_file:
-        plaintext2_file.write(str(i))
+        for c_text in ciphertext_file:
+            a = pow(int(c_text), phi * pow(r, -1, n_) % n_, n_)
+            for i in range(r - 1):
+                if pow(x, i, n_) == a:
+                    break
+            # print(i, chr(i))
+            plaintext2_file.write(str(chr(i)))
 
     same = is_same("plaintext.txt", "plaintext2.txt")
     print(same)
     return same
 
 
-def is_same(file1, file2):
+def is_same(path1, path2):
     """
-    Tek satırdan oluştuğu kabul edilen dosyaların içeriklerini kıyaslayıp
-    aynı olup olmadıklarını geri döndüren fonksiyon.
+    Dosyaların içeriklerini kıyaslayıp aynı olup
+    olmadıklarını geri döndüren fonksiyon.
 
     Arguments:
         file1 (str) : Kiyaslanacak kaynagin yolu
@@ -211,33 +173,43 @@ def is_same(file1, file2):
         bool : file 1, file 2 ile ayniysa True, degilse False dondurur.
     """
 
-    if not os.path.exists(file1):
+    if not os.path.exists(path2):
         print(
             'hata: Karşılaştırmak için kullanacağınız ilk dosya bulunamadı.')
         exit()
 
-    if not os.path.exists(file2):
+    if not os.path.exists(path1):
         print(
             'hata: Karşılaştırmak için kullanacağınız ikinci dosya bulunamadı.')
         exit()
+    with open(path1, "r") as f1:
+        l1 = f1.read().split('\n')
 
-    f1 = open(file1, 'r')
-    f2 = open(file2, 'r')
+    with open(path2, "r") as f2:
+        l2 = f2.read().split('\n')
 
-    t1 = f1.readline().split('\n')[0]
-    t2 = f2.readline().split('\n')[0]
+    while "" in l1:
+        l1.remove("")
 
-    if t1 == t2:
-        return True
-    else:
+    while "" in l2:
+        l2.remove("")
+
+    if len(l1) != len(l2):
         return False
 
+    for elem_1, elem_2 in zip(l1, l2):
+        if elem_1 != elem_2:
+            return False
+
+    return True
+
+
 # Test:
-#"""
+"""
 t1 = time.time()
-keygen(42)
+keygen(32)
 encrypt("plaintext.txt", "publickey.txt")
 decrypt("ciphertext.txt", "privatekey.txt")
 t2 = time.time()
 print('calisma suresi:', t2 - t1)
-#"""
+"""
