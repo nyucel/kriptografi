@@ -2,7 +2,6 @@
 #Şahan Can SARKI
 #Berat KANAR
 
-
 import random
 import filecmp as fc
 def gcd(a,b): 
