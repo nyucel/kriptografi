@@ -116,7 +116,6 @@ def decrypt(ciphertext, privatekeytxt):
 
     except FileNotFoundError:
         print("Anahtar çiftleri oluşturulmadan deşifreleme işlemi yapılamz. Lütfen önce Keygen fonksiyonunu çalıştırın.")
-
     else:
         privateKeyFile = open(privatekeytxt, "r")
         phi, x, N = privateKeyFile.read().split("\n")
