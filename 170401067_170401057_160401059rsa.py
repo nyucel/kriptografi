@@ -1,6 +1,6 @@
 #Enes Nurullah KENDİRCİ
-
-
+#Şahan Can SARKI
+#Berat KANAR
 
 import random
 import filecmp as fc
