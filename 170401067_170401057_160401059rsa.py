@@ -1,5 +1,5 @@
 #Enes Nurullah KENDİRCİ
-
+#Şahan Can SARKI
 
 
 import random
