@@ -45,7 +45,7 @@ def keygen(n):
     private.write("-"+str(qNumber))
     private.write("-"+str(rNumber))
 
-
+ 
 def encrypt(plaintext, publickeytxt):
   if(os.path.isfile(publickeytxt)!=False):
       BArray=[]
