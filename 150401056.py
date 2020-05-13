@@ -1,9 +1,12 @@
 #okul numaram 150401056
+#Damgard Jurik
+
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import os
 import random
 from functools import reduce
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
 
 def isprime(a):
     """bir sayının asal olup olmadığını kontrol eden fonksiyon"""
