@@ -1,0 +1,16 @@
+
+.test.py.swp
+
+.test.py.swo
+
+.idea/
+
+Atak4nhrTest/Kütüphane/ciphertext
+
+Atak4nhrTest/Kütüphane/plaintext2
+
+Atak4nhrTest/Kütüphane/privatekey.txt
+
+Atak4nhrTest/Kütüphane/publickey.txt
+
+Kütüphane/__pycache__/
