@@ -1,5 +1,6 @@
 #Enes Nurullah KENDİRCİ
 #Şahan Can SARKI
+#Berat KANAR
 
 
 import random
