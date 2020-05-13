@@ -2,6 +2,7 @@
 #Python3.8 bağımlılığı vardır.
 
 #Barış Kaan BAYRAM
+#Ata Osman ÖZGÜZ
 
 import random
 import sys
