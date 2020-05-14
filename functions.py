@@ -25,3 +25,4 @@ def allprimes(n):
                 primes[i]=0
     primes.sort()
     return(primes[primes.count(0):])
+
