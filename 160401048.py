@@ -153,6 +153,6 @@ def decrypt(ciphertext, privatekey):
 
 
 
-keygen(int(input("Bit uzunluğunu giriniz:")))
-encrypt("plaintext", "publickey.txt")
-decrypt("ciphertext", "privatekey.txt")
+#keygen(int(input("Bit uzunluğunu giriniz:")))
+#encrypt("plaintext", "publickey.txt")
+#decrypt("ciphertext", "privatekey.txt")
