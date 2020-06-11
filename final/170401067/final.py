@@ -2,7 +2,7 @@
 """
 Created on Wed Jun 10 20:18:58 2020
 
-@author: EnesNK
+@author: Enes Nurullah Kendirci 170401067
 """
 
 import random
