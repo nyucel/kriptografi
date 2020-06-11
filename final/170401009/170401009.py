@@ -10,7 +10,7 @@
 # '{:b}'.format(int(hashlib.md5("ata".encode()).hexdigest(),16)).zfill(128) hex->int->binary
 #  '{0:x}'.format(122545).zfill(32)
 
-import hashlib
+
 import random
 import binascii
 import time
@@ -95,25 +95,25 @@ def final(dosya):
     parca2 = "".join(parcalar[1])
     parca3 = "".join(parcalar[2])
     parca4 = "".join(parcalar[3])
-    parca1 = binary_to_int(parca1) + magic_numbers[0]
-    parca1 = parca1 | magic_numbers[0]
-    # print(parca1)
-    parca1 >>= (bit_toplamı % 5)
-    parca1 = parca1 | magic_numbers[3]
-    # print(parca1)
-    parca2 = binary_to_int(parca2) ^ magic_numbers[1]
-    dosya = parca1 + parca2
-    dosya = left_rotate(dosya, 11)
-    dosya = ~dosya
-    # print(dosya)
-    parca3 = binary_to_int(parca3) | magic_numbers[2]
-    dosya = dosya + ~parca3
-    # print(dosya)
-    parca4 = binary_to_int(parca4) & magic_numbers[3]
-    parca4 <<= bit_toplamı % 21
-    # print(parca4)
-    dosya = dosya ^ parca4
-    # dosya = binary_to_int(parca1)+binary_to_int(parca2)+binary_to_int(parca3)+binary_to_int(parca4)
+    # parca1 = binary_to_int(parca1) + magic_numbers[0]
+    # parca1 = parca1 | magic_numbers[0]
+    # # print(parca1)
+    # parca1 >>= (bit_toplamı % 5)
+    # parca1 = parca1 | magic_numbers[3]
+    # # print(parca1)
+    # parca2 = binary_to_int(parca2) ^ magic_numbers[1]
+    # dosya = parca1 + parca2
+    # dosya = left_rotate(dosya, 11)
+    # dosya = ~dosya
+    # # print(dosya)
+    # parca3 = binary_to_int(parca3) | magic_numbers[2]
+    # dosya = dosya + ~parca3
+    # # print(dosya)
+    # parca4 = binary_to_int(parca4) & magic_numbers[3]
+    # parca4 <<= bit_toplamı % 21
+    # # print(parca4)
+    # dosya = dosya ^ parca4
+    dosya = binary_to_int(parca1)+binary_to_int(parca2)+binary_to_int(parca3)+binary_to_int(parca4)
 
 
     dosya = dosya % 2**32 #32 bit
@@ -143,16 +143,15 @@ class blockchain:
             f = open(dosya_ismi,"rb")
             a =f.read()
             f.close()
-            hashler.append(hashlib.md5(a).hexdigest()) #çivi çiviyi söker
+            hashler.append(final(a))
         # print(hashler)
 
         setOfElems = set()
         for elem in hashler:
             if elem in setOfElems:
-                print("ÇAKIŞMA VAR {}".format(elem))
+                print("ÇAKIŞMA VAR {}".format(elem))   #kaç tane çakışma var ?
             else:
                 setOfElems.add(elem)
-        print("1-100 TXT ARASINDA HİÇ ÇAKIŞMA BULUNAMADI")
 
 
 class blok:
