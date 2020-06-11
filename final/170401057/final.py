@@ -33,7 +33,6 @@ def final(dosya):
         print(hex(int(cikti16bit)) + "----> eski çıktısı" ,hex(int(data)))
     return(bin(int(cikti16bit, 2))[2:].zfill(32))
         
-final("001.txt")
         
 class Block():
      
