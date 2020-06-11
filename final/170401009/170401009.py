@@ -9,16 +9,80 @@
 
 # '{0:b}'.format(random.randint(2**31,2**32-1))  #32 bitlik rastgele bir sayı oluşturuyor.
 # '{:b}'.format(int(hashlib.md5("ata".encode()).hexdigest(),16)).zfill(128) hex->int->binary
-
+#   '{0:x}'.format(122545).zfill(32)
 import hashlib
 import random
 import binascii
 import time
 
+def string_to_int(data):
+    return int(binascii.hexlify(data.encode('utf-8')).decode("ascii"),16) #byte değerini int değerine çeviriyor..
+
+def int_to_binary(data):
+    return '{0:b}'.format(data)
+def binary_to_int(data):
+    return int(data,2)
+def bytes_to_binary(data):
+    return int_to_binary(string_to_int(data.decode()))
+
+
+def left_rotate(x, amount):
+    x &= 0xFFFFFFFF
+    return ((x<<amount) | (x>>(32-amount))) & 0xFFFFFFFF
 
 def final(dosya): #todo hash fonksiyonu değiştirilecek
     # return '{:b}'.format(int(hashlib.md5(dosya).hexdigest(), 16)).zfill(128)
-    return int(hashlib.md5(dosya).hexdigest(), 16)
+    magic_numbers = [0xFEE1DEAD, 0xBADDCAFE, 0xDEAD10CC, 0x8BADF00D]
+    if type(dosya)!= bytes:
+        dosya = dosya.encode()
+    uzunluk = len(bytes_to_binary(dosya))
+    ekstra = uzunluk % 4    #4 parçaya bölünüyor mu
+    dosya = bytes_to_binary(dosya).zfill(ekstra)     #dosyayı 4 e bölünür hale getiriyorum
+    parcalar=[[],[],[],[]]
+    bit_toplamı=0
+    print(uzunluk)
+    print(ekstra)
+    print(dosya)
+    print(parcalar)
+    for i in dosya:
+        bit_toplamı+=int(i)
+        if len(parcalar[0]) <= uzunluk/4:
+            print(len(parcalar[0]))
+            parcalar[0].append(str(i))
+        elif len(parcalar[2]) <= uzunluk/4:
+            parcalar[2].append(str(i))
+        elif len(parcalar[3]) <= uzunluk/4:
+            parcalar[3].append(str(i))
+        else:
+            parcalar[1].append(str(i))
+    print(parcalar)
+    parca1="".join(parcalar[0])
+    parca2="".join(parcalar[1])
+    parca3="".join(parcalar[2])
+    parca4="".join(parcalar[3])
+    print(parca1,parca2,parca3,parca4)
+    parca1 = binary_to_int(parca1) ^ magic_numbers[0]
+    print(parca1)
+    parca1 >>=bit_toplamı % 7
+    print(parca1)
+    parca2 = binary_to_int(parca2) ^ magic_numbers[1]
+    dosya = parca1+parca2
+    dosya << 42
+    print(dosya)
+    parca3 = binary_to_int(parca3) | magic_numbers[2]
+    dosya = dosya+~parca3
+    print(dosya)
+    parca4 = binary_to_int(parca4) & magic_numbers[3]
+    parca4 <<=bit_toplamı % 21
+    print(parca4)
+    dosya = dosya ^ parca4
+    print(dosya)
+    dosya = dosya % 2**32
+    print(dosya)
+    # dosya = int_to_binary(dosya)
+    # print(dosya)
+    # dosya=dosya.zfill(32) # 32 bite tamamlıyoruz
+    return dosya
 
 class blockchain: #todo burayı tamamla
     def __init__(self,baslangic=1,bitis=100):
@@ -71,17 +135,20 @@ class blok:
     def blok_kaydet(self):
         f = open("{}.{}".format(self.blok_numarası, self.uzanti), "w")
         toplam = self.oncekiblokhash + self.rastgele
-        f.write('{:b}'.format(toplam).zfill(128))
+        f.write('{:b}'.format(toplam).zfill(32))
         f.close()
 
     def hashsum_kaydet(self):
         f = open("HASHSUM", "a")
         if int(self.blok_numarası) == 2:
             f.write("BLOK | RASTGELE SAYI | BLOĞUN KENDİ HASHI\n")
-        f.write("{} | {} | {} \n".format(self.blok_numarası, '{:b}'.format(self.rastgele).zfill(32), '{:b}'.format(self.blokhash).zfill(128))) #todo hash fonksiyonunu değiştirince zfilleri değiştir.
+        f.write("{} | {} | {} \n".format(self.blok_numarası, '{:b}'.format(self.rastgele).zfill(32), '{:b}'.format(self.blokhash).zfill(32))) #todo hash fonksiyonunu değiştirince zfilleri değiştir.
         f.close()
 
 
 if __name__ == "__main__":
      bchain = blockchain()
      bchain.zincirle()
+     # a = open("001.txt", "rb")
+     # a = a.read()
+     # final(a)
