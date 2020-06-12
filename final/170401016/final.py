@@ -4,7 +4,6 @@ import binascii
 import random
 import time
 
-# 32 bit ciktiya, 8 bitlik 4 adet buffera sahip MD5 implementasyonu.
 
 rotate = [
     131, 234, 148, 165, 180, 159, 216, 207, 187, 254,
