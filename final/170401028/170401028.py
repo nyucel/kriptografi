@@ -62,7 +62,7 @@ class BlockChain:
 
     def start_chain(self):
         start_time = time.time()
-        while self.lower_bound < self.upper_bound and start_time< time.time()+600: # sınır aşılmamış ve zaman dolmamışsa
+        while self.lower_bound < self.upper_bound and start_time+600 > time.time(): # sınır aşılmamış ve zaman dolmamışsa
             f_name = "00" + str(self.lower_bound) + ".txt" if self.lower_bound < 10 else "0" + str(
                 self.lower_bound) + ".txt"
 
