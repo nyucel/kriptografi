@@ -115,7 +115,7 @@ def check_block(block, random_number):
 
 
 def blockchain():
-    end_time = time.time() + 10
+    end_time = time.time() + 600
     hashsum = open("HASHSUM", "w")
     for i in range(2, 101):
         while time.time() <= end_time:
