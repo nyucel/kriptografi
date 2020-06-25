@@ -1,0 +1,1 @@
+Program çalıştırıldığında menüde 2 seçenek listelenir.İlki özet alma işlemini yapar ve özet aldıktan sonra program sonlanır.2. seçenekte verilen dosya.txt uzantısındaki satırların ilk 6 karakterinin özetini alarak golge.txt ile karsılastırır.İşlem bittikten sonra 5 saniye içinde program sonlanır.
