@@ -1,0 +1,1 @@
+6 karakterlik girdinin öncelikle binary karşılığı bulunur. Daha sonra xor işlemleri uygulanarak 32 bitlik binary özet değeri elde edilir. golge.txt dosyasına 8 karakterlik hexadecimal özet değeri yazılır.
