@@ -8,11 +8,12 @@ Created on Wed Jun 10 20:18:58 2020
 import random
 from datetime import datetime
 
-def final(dosya):
+def final(dosya): #istenilen final fonksiyonu
     with open(dosya, 'rb') as d:
         data = ((d.read()).decode()).zfill(32)
     girdi = data
-    girdi = '10000000010110000011000010010010' + girdi
+    
+    girdi = '10000000010110000011000010010010' + girdi #gerekli ozet icin dosyayi 16 bit sola kaydirip ikiye bolup xor islemleri uyguluyorum
     kayik = bin(int(girdi,2) << 16)
     kayikilk = kayik[:32]
     kayikson = kayik[32:]
@@ -22,22 +23,27 @@ def final(dosya):
     
     return ozet
  
-sure = datetime.now().minute
+sure = datetime.now().minute    #sure kosulu
 for i in range(1,101):
-    sureKontrol = datetime.now().minute - sure
-    if(sureKontrol < 10):
+    sureKontrol = datetime.now().minute - sure #satir 26
+    
+    if(sureKontrol < 10): #dosyanin hazirlanmasi
         if(i < 10):
             dosyaAdi = '00' + str(i) + '.txt'
         elif(i<100):
             dosyaAdi = '0' + str(i) + '.txt'
+            
         ozet = str(final(dosyaAdi))
         
-        while(1):
+        while(1): #gerekli kosul saglanana kadar denenmeyi saglayan while dongusu (satir57)
+            
             rasgaleSayi =  random.getrandbits(32)
             toplam = (bin(int(ozet,2) + rasgaleSayi))[2:].zfill(32)
-            if(len(toplam) > 32):
+            
+            if(len(toplam) > 32): #overflow
                 toplam = toplam[-32:]
-            if(i < 9):
+            
+            if(i < 9): #yeni ozetin yazilmasi
                 dosyaAdi = '00' + str(i + 1) + '.txt'
                 dosya = open(dosyaAdi, 'w')
             elif(i<99):
@@ -47,17 +53,13 @@ for i in range(1,101):
                 dosyaAdi = '100.txt'
                 dosya = open(dosyaAdi, 'w')
             dosya.write(toplam)
-            kontrol = (str(final(dosyaAdi)).zfill(32))
+            
+            kontrol = (str(final(dosyaAdi)).zfill(32)) #ilk 8bitin 0 olma kosulu
             if(kontrol[:8] == '00000000'):
                 hashsum = open('HASHSUM.txt', 'a')
                 hashsum.write((bin(rasgaleSayi))[2:].zfill(32) + ' - ' + kontrol + '\n')
                 hashsum.close()
-                break
+                break #gerekli kosul saglanince whiledan cikis
                 
-    else:
+    else: #surenin bitme durumu
         print("Hocam bitti' -Yılmaz Vural")
-
-
-
-
-    
